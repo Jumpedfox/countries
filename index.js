@@ -18,24 +18,43 @@ const debounce = (fn, ms) => {
 function getCountry() {
   let countries = [];
   let languages = [];
+  let datalist = [];
+  let option;
   return fetch(`https://restcountries.com/v2/name/${input.value}`)
     .then((response) => {
       if (response.ok) return response.json();
       throw new Error("Error fetching data");
     })
     .then((response) => {
-      if (response.length <= 3) {
+      console.log(infodiv);
+      if (response.length > 1 && response.length < 10) {
+        cName.textContent = "";
+        cCapital.textContent = "";
+        cPopulation.textContent = "";
+        cLanguages.textContent = "";
+        cFlag.setAttribute('hidden', `true`)
+        response.forEach((country) => countries.push(country));
+        countries.forEach((country) => datalist.push(country.name));
+        datalist.forEach(function(element) {
+          option = document.createElement('li');
+          option.textContent = element;
+          cName.appendChild(option);
+        });
+        // console.log((cName));
+      }
+      else if (response.length <= 1) {
         response.forEach((country) => countries.push(country));
         cName.textContent = countries[0].name;
-        console.log(countries);
         cCapital.textContent = "Capital: " + countries[0].capital;
         cPopulation.textContent = "Population: " + countries[0].population + " ppl";
         let languageList = countries[0].languages;
         languageList.forEach((language) => languages.push(language.name));
         cLanguages.textContent = "Languages: " + languages;
         let flagPic = countries[0].flags.png;
+        cFlag.removeAttribute('hidden')
         cFlag.setAttribute('src', `${flagPic}`)
       } else {
+        cName.textContent = "";
         alert("Too many countries! Refine your request!");
       }
     })
